@@ -220,7 +220,10 @@
 
     <div class="app-header">
       <div class="eyebrow">Thuemail.net</div>
-      <span class="logout-link" id="logoutBtn">Đổi API key</span>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <span class="logout-link" id="shareLinkBtn">🔗 Link thiết bị khác</span>
+        <span class="logout-link" id="logoutBtn">Đổi API key</span>
+      </div>
     </div>
     <div class="title">Mail Live TikTok / YouTube</div>
     <div class="subtitle">Mua xong copy email ngay · hàng tươi theo giờ</div>
@@ -275,8 +278,27 @@
       <a href="https://thuemail.net" target="_blank" rel="noopener" style="color:var(--muted);">thuemail.net</a>
     </div>
 
+  </div><!-- /#app -->
+
+  <!-- SHARE MODAL -->
+  <div id="shareModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;align-items:center;justify-content:center;padding:16px;">
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;width:100%;max-width:440px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <span style="font-size:14px;font-weight:700;color:var(--text);">🔗 Link tự đăng nhập</span>
+        <span id="shareClose" style="cursor:pointer;color:var(--muted);font-size:20px;line-height:1;">✕</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Gửi link này cho thiết bị khác — mở lên tự vào luôn, không cần nhập key:</div>
+      <div style="display:flex;gap:8px;">
+        <input id="shareLinkInput" readonly style="flex:1;padding:11px 12px;background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--accent);font-size:11px;font-family:inherit;outline:none;">
+        <button id="shareCopyBtn" style="flex-shrink:0;padding:11px 16px;background:var(--accent);color:#0a1a17;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.04em;">Copy</button>
+      </div>
+      <div style="margin-top:12px;padding:10px 12px;background:var(--accent-dim);border-radius:8px;font-size:11px;color:var(--muted);line-height:1.7;">
+        ⚠️ Link chứa API key của bạn. Chỉ gửi cho thiết bị <b style="color:var(--text)">của chính bạn</b>, không chia sẻ công khai.
+      </div>
+    </div>
   </div>
-</div>
+
+</div><!-- /#root -->
 
 <script>
 /* ═══════════════════════════════════════════════════════════
@@ -393,6 +415,23 @@ async function doLogin(){
     btn.textContent = 'Xác nhận & tiếp tục';
   }
 }
+
+/* ── Share link ── */
+const shareModal = $('shareModal');
+$('shareLinkBtn').addEventListener('click', () => {
+  const link = `${location.origin}${location.pathname}?key=${encodeURIComponent(currentKey)}`;
+  $('shareLinkInput').value = link;
+  shareModal.style.display = 'flex';
+});
+$('shareClose').addEventListener('click', () => { shareModal.style.display = 'none'; });
+shareModal.addEventListener('click', e => { if(e.target === shareModal) shareModal.style.display = 'none'; });
+$('shareCopyBtn').addEventListener('click', () => {
+  copyText($('shareLinkInput').value);
+  const btn = $('shareCopyBtn');
+  btn.textContent = 'Đã copy!';
+  btn.style.background = '#4ade80';
+  setTimeout(() => { btn.textContent = 'Copy'; btn.style.background = 'var(--accent)'; }, 1800);
+});
 
 /* ── Logout ── */
 $('logoutBtn').addEventListener('click', () => {
