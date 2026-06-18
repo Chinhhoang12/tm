@@ -210,8 +210,8 @@
     <button id="loginBtn">Xác nhận &amp; tiếp tục</button>
     <div id="loginError"></div>
     <div class="hint">
-      Key được lưu tạm trong session trình duyệt.<br>
-      Đóng tab → key bị xóa, mở lại cần nhập lại.<br><br>
+      Key được lưu trong trình duyệt (localStorage).<br>
+      Đóng tab → mở lại <b style="color:var(--accent)">vẫn tự đăng nhập</b>.<br><br>
       <a href="https://thuemail.net" target="_blank" rel="noopener">→ Đăng nhập thuemail.net để lấy API key</a>
     </div>
   </div>
@@ -352,8 +352,18 @@ function bootApp(key, mode){
 if(isPublicMode()){
   bootApp(PUBLIC_API_KEY.trim(), 'public');
 } else {
-  const saved = sessionStorage.getItem('tm_api_key');
-  if(saved) bootApp(saved, 'private');
+  // Ưu tiên 1: key trong URL (?key=xxx) → auto-login
+  const urlKey = new URLSearchParams(window.location.search).get('key');
+  if(urlKey && urlKey.trim()){
+    const k = urlKey.trim();
+    localStorage.setItem('tm_api_key', k);
+    history.replaceState(null, '', window.location.pathname); // ẩn key khỏi thanh URL
+    bootApp(k, 'private');
+  } else {
+    // Ưu tiên 2: key đã lưu localStorage → tự đăng nhập
+    const saved = localStorage.getItem('tm_api_key');
+    if(saved) bootApp(saved, 'private');
+  }
 }
 
 /* ── Login ── */
@@ -370,7 +380,7 @@ async function doLogin(){
   try {
     const data = await apiPost(STOCK_URL, { api_key: raw });
     if(data.status === 'success'){
-      sessionStorage.setItem('tm_api_key', raw);
+      localStorage.setItem('tm_api_key', raw);
       bootApp(raw, 'private');
     } else {
       loginError.textContent = 'API key không hợp lệ. Kiểm tra lại.';
@@ -386,7 +396,7 @@ async function doLogin(){
 
 /* ── Logout ── */
 $('logoutBtn').addEventListener('click', () => {
-  sessionStorage.removeItem('tm_api_key');
+  localStorage.removeItem('tm_api_key');
   currentKey = ''; selectedProductId = null; lastKeys = []; stockProducts = [];
   appEl.style.display = 'none';
   loginScreen.style.display = 'block';
