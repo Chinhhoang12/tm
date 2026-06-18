@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thuê Mail · Tool</title>
+<style>
+  :root{
+    --bg:#0e1014;
+    --panel:#161922;
+    --panel-2:#1d212c;
+    --line:#2a2f3b;
+    --text:#e9ecf1;
+    --muted:#8b93a3;
+    --accent:#5eead4;
+    --accent-dim:#163832;
+    --danger:#ff6b6b;
+    --warn:#f5a623;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'JetBrains Mono','SF Mono',ui-monospace,Menlo,Consolas,monospace;
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:32px 16px;
+  }
+  #root{width:100%;max-width:480px;}
+
+  /* ── LOGIN ── */
+  #loginScreen{text-align:center;padding-top:60px;}
+  .tag{color:var(--accent);font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px;}
+  #loginScreen h1{font-size:20px;margin:0 0 6px;font-weight:600;color:var(--text);}
+  #loginScreen p{color:var(--muted);font-size:13px;margin:0 0 28px;line-height:1.6;}
+  #apiKeyInput{
+    width:100%;padding:14px 16px;
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:8px;color:var(--text);font-size:14px;
+    font-family:inherit;text-align:center;letter-spacing:.05em;outline:none;
+  }
+  #apiKeyInput:focus{border-color:var(--accent);}
+  #loginBtn{
+    width:100%;margin-top:10px;padding:14px;
+    background:var(--accent);color:#0a1a17;border:none;
+    border-radius:8px;font-size:14px;font-weight:700;
+    letter-spacing:.05em;text-transform:uppercase;cursor:pointer;font-family:inherit;
+  }
+  #loginBtn:hover{background:#7af0de;}
+  #loginBtn:disabled{background:#3a4250;color:var(--muted);cursor:not-allowed;}
+  #loginError{color:var(--danger);font-size:13px;margin-top:10px;min-height:18px;}
+  .hint{color:var(--muted);font-size:11px;margin-top:24px;line-height:1.8;}
+  .hint a{color:var(--accent);text-decoration:none;}
+  .hint a:hover{text-decoration:underline;}
+
+  /* ── APP ── */
+  #app{display:none;}
+
+  .app-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+  .eyebrow{color:var(--accent);font-size:11px;letter-spacing:.18em;text-transform:uppercase;}
+  .logout-link{color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;}
+  .logout-link:hover{color:var(--text);}
+
+  .title{font-size:22px;font-weight:700;margin:0 0 2px;color:var(--text);}
+  .subtitle{color:var(--muted);font-size:13px;margin-bottom:14px;}
+
+  .mode-badge{
+    display:inline-block;padding:3px 12px;
+    border-radius:20px;font-size:11px;
+    letter-spacing:.06em;text-transform:uppercase;margin-bottom:18px;
+  }
+  .mode-badge.private{background:#163832;color:var(--accent);}
+  .mode-badge.public{background:#2a1f08;color:var(--warn);}
+
+  .card{
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;padding:20px;margin-bottom:14px;
+  }
+
+  .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;}
+  .row:last-child{margin-bottom:0;}
+  .row .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em;}
+  .row .value{font-size:14px;color:var(--text);}
+  .row .value.balance{color:var(--accent);font-weight:700;font-size:16px;}
+
+  .section-title{
+    color:var(--muted);font-size:11px;text-transform:uppercase;
+    letter-spacing:.1em;margin-bottom:12px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .refresh-btn{
+    background:none;border:none;color:var(--accent);
+    cursor:pointer;font-size:11px;font-family:inherit;
+    padding:0;text-transform:uppercase;letter-spacing:.05em;
+  }
+  .refresh-btn:hover{text-decoration:underline;}
+  .refresh-btn:disabled{color:var(--muted);cursor:not-allowed;}
+
+  table.stock{width:100%;border-collapse:collapse;font-size:13px;}
+  table.stock th{
+    color:var(--muted);font-weight:400;text-align:left;
+    padding:6px 0;border-bottom:1px solid var(--line);
+  }
+  table.stock th:nth-child(2),
+  table.stock td:nth-child(2){text-align:right;}
+  table.stock th:last-child,
+  table.stock td:last-child{text-align:right;}
+  table.stock td{padding:9px 0;border-bottom:1px solid var(--line);color:var(--text);}
+  table.stock tr:last-child td{border-bottom:none;}
+  .price-cell{color:var(--accent);}
+  .stock-ok{color:#4ade80;}
+  .stock-low{color:var(--warn);}
+  .stock-empty{color:var(--danger);}
+
+  .prod-list{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;}
+  .prod-item{
+    padding:12px 14px;border:1px solid var(--line);
+    border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;
+  }
+  .prod-item:hover{border-color:#4a5568;}
+  .prod-item.selected{border-color:var(--accent);background:var(--accent-dim);}
+  .prod-item.disabled-prod{opacity:.5;cursor:not-allowed;}
+  .prod-name{font-size:13px;font-weight:600;margin-bottom:4px;color:var(--text);}
+  .prod-meta{font-size:12px;color:var(--muted);}
+  .prod-meta .hi{color:var(--accent);}
+
+  .qty-block{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+  .qty-label{font-size:13px;color:var(--muted);}
+  .qty-control{
+    display:flex;align-items:center;
+    border:1px solid var(--line);border-radius:8px;overflow:hidden;
+  }
+  .qty-control button{
+    width:36px;height:36px;background:var(--panel-2);
+    border:none;color:var(--text);font-size:18px;cursor:pointer;
+  }
+  .qty-control button:hover{background:var(--line);}
+  .qty-control input{
+    width:52px;height:36px;text-align:center;border:none;
+    border-left:1px solid var(--line);border-right:1px solid var(--line);
+    background:var(--bg);color:var(--text);font-family:inherit;font-size:14px;
+  }
+
+  #buyBtn{
+    width:100%;padding:16px;background:var(--accent);
+    color:#0a1a17;border:none;border-radius:8px;
+    font-size:14px;font-weight:700;letter-spacing:.05em;
+    text-transform:uppercase;cursor:pointer;font-family:inherit;
+  }
+  #buyBtn:hover{background:#7af0de;}
+  #buyBtn:disabled{background:#3a4250;color:var(--muted);cursor:not-allowed;}
+
+  #statusMsg{margin-top:13px;font-size:13px;text-align:center;min-height:18px;line-height:1.5;}
+  #statusMsg.err{color:var(--danger);}
+  #statusMsg.ok{color:var(--accent);}
+
+  #resultCard{display:none;}
+  .order-code{color:var(--muted);font-size:12px;margin-bottom:10px;}
+  .key-item{
+    background:var(--panel-2);border:1px solid var(--line);
+    border-radius:8px;padding:11px 13px;margin-bottom:8px;
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+  }
+  .key-text{font-size:13px;word-break:break-all;color:var(--text);}
+  .key-item button{
+    flex-shrink:0;background:transparent;border:1px solid var(--line);
+    color:var(--accent);border-radius:6px;padding:5px 10px;
+    font-size:11px;text-transform:uppercase;letter-spacing:.04em;
+    cursor:pointer;font-family:inherit;
+  }
+  .key-item button:hover{border-color:var(--accent);background:var(--accent-dim);}
+  .key-item button.copied{color:#0a1a17;background:var(--accent);border-color:var(--accent);}
+
+  .copy-all{
+    width:100%;margin-top:8px;padding:12px;
+    background:transparent;border:1px solid var(--accent);
+    color:var(--accent);border-radius:8px;font-size:13px;
+    font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+    cursor:pointer;font-family:inherit;
+  }
+  .copy-all:hover{background:var(--accent-dim);}
+  .copy-all.copied{background:var(--accent);color:#0a1a17;}
+
+  .footer-note{text-align:center;color:var(--muted);font-size:11px;margin-top:20px;line-height:1.8;}
+
+  .spinner{
+    display:inline-block;width:13px;height:13px;
+    border:2px solid rgba(10,26,23,.35);border-top-color:#0a1a17;
+    border-radius:50%;animation:spin .7s linear infinite;
+    vertical-align:middle;margin-right:5px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+  input[type=number]{-moz-appearance:textfield;}
+</style>
+</head>
+<body>
+<div id="root">
+
+  <div id="loginScreen">
+    <div class="tag">Thuemail.net · Tool</div>
+    <h1>Nhập API Key của bạn</h1>
+    <p>Lấy API key trong trang tài khoản thuemail.net<br>Mỗi tài khoản có một key riêng.</p>
+    <input type="text" id="apiKeyInput" placeholder="Dán API key vào đây..." autocomplete="off" spellcheck="false">
+    <button id="loginBtn">Xác nhận &amp; tiếp tục</button>
+    <div id="loginError"></div>
+    <div class="hint">
+      Key được lưu tạm trong session trình duyệt.<br>
+      Đóng tab → key bị xóa, mở lại cần nhập lại.<br><br>
+      <a href="https://thuemail.net" target="_blank" rel="noopener">→ Đăng nhập thuemail.net để lấy API key</a>
+    </div>
+  </div>
+
+  <div id="app">
+
+    <div class="app-header">
+      <div class="eyebrow">Thuemail.net</div>
+      <span class="logout-link" id="logoutBtn">Đổi API key</span>
+    </div>
+    <div class="title">Mail Live TikTok / YouTube</div>
+    <div class="subtitle">Mua xong copy email ngay · hàng tươi theo giờ</div>
+    <span class="mode-badge" id="modeBadge"></span>
+
+    <div class="card">
+      <div class="row">
+        <span class="label">Số dư tài khoản</span>
+        <span class="value balance" id="balanceVal">—</span>
+      </div>
+      <div class="section-title">
+        <span>Tồn kho sản phẩm</span>
+        <button class="refresh-btn" id="refreshBtn">↻ Làm mới</button>
+      </div>
+      <table class="stock">
+        <thead>
+          <tr><th>Sản phẩm</th><th>Giá</th><th>Tồn</th></tr>
+        </thead>
+        <tbody id="stockBody">
+          <tr><td colspan="3" style="color:var(--muted);padding:14px 0;text-align:center;">Đang tải...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="section-title" style="margin-bottom:14px;">
+        <span>Chọn sản phẩm</span>
+      </div>
+      <div class="prod-list" id="prodList">
+        <div style="color:var(--muted);font-size:13px;text-align:center;padding:14px;">Đang tải sản phẩm...</div>
+      </div>
+      <div class="qty-block">
+        <span class="qty-label">Số lượng</span>
+        <div class="qty-control">
+          <button id="qtyMinus" type="button">−</button>
+          <input type="number" id="qtyInput" value="1" min="1" max="20">
+          <button id="qtyPlus" type="button">+</button>
+        </div>
+      </div>
+      <button id="buyBtn">Mua ngay</button>
+      <div id="statusMsg"></div>
+    </div>
+
+    <div class="card" id="resultCard">
+      <div class="order-code" id="orderCode"></div>
+      <div id="keyList"></div>
+      <button class="copy-all" id="copyAllBtn" type="button">Copy tất cả</button>
+    </div>
+
+    <div class="footer-note">
+      Tool dùng nội bộ &nbsp;·&nbsp; Đóng tab để xóa session &nbsp;·&nbsp;
+      <a href="https://thuemail.net" target="_blank" rel="noopener" style="color:var(--muted);">thuemail.net</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   CẤU HÌNH
+   ─────────────────────────────────────────────────────────
+   PUBLIC_API_KEY : Điền key để chạy chế độ PUBLIC.
+                    Để trống "" = chế độ PRIVATE (phải nhập key).
+
+   ⚠️  PROXY_BASE : Để "" = tự dùng cùng domain (Vercel).
+                    Nếu deploy proxy riêng thì điền URL đó.
+═══════════════════════════════════════════════════════════ */
+const PUBLIC_API_KEY = "";   // ← key public (nếu cần)
+const PROXY_BASE     = "";   // ← để "" khi frontend & proxy cùng Vercel project
+
+/* Các endpoint đi qua proxy — KHÔNG gọi thuemail.net trực tiếp nữa */
+const BUY_URL   = `${PROXY_BASE}/api/proxy?target=buy`;
+const STOCK_URL = `${PROXY_BASE}/api/proxy?target=stock`;
+/* ═══════════════════════════════════════════════════════════ */
+
+let currentKey        = "";
+let selectedProductId = null;
+let lastKeys          = [];
+let stockProducts     = [];
+
+const $ = id => document.getElementById(id);
+const loginScreen = $('loginScreen');
+const appEl       = $('app');
+const loginError  = $('loginError');
+const modeBadge   = $('modeBadge');
+const balanceVal  = $('balanceVal');
+const stockBody   = $('stockBody');
+const prodList    = $('prodList');
+const qtyInput    = $('qtyInput');
+const buyBtn      = $('buyBtn');
+const statusMsg   = $('statusMsg');
+const resultCard  = $('resultCard');
+const keyList     = $('keyList');
+const orderCodeEl = $('orderCode');
+const copyAllBtn  = $('copyAllBtn');
+
+function fmtNum(n){ return new Intl.NumberFormat('vi-VN').format(n); }
+function escHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function stockClass(n){ return n===0?'stock-empty':n<50?'stock-low':'stock-ok'; }
+
+/* ── Gọi proxy — JSON body thay vì FormData ── */
+async function apiPost(url, payload){
+  const res = await fetch(url, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload),
+  });
+  return res.json();
+}
+
+function isPublicMode(){ return PUBLIC_API_KEY.trim().length > 0; }
+
+function bootApp(key, mode){
+  currentKey = key;
+  loginScreen.style.display = 'none';
+  appEl.style.display = 'block';
+  if(mode === 'public'){
+    modeBadge.textContent = '🌐 Chế độ công khai';
+    modeBadge.className = 'mode-badge public';
+    $('logoutBtn').style.display = 'none';
+  } else {
+    modeBadge.textContent = '🔒 Chế độ riêng tư';
+    modeBadge.className = 'mode-badge private';
+    $('logoutBtn').style.display = 'inline';
+  }
+  loadStock();
+}
+
+if(isPublicMode()){
+  bootApp(PUBLIC_API_KEY.trim(), 'public');
+} else {
+  const saved = sessionStorage.getItem('tm_api_key');
+  if(saved) bootApp(saved, 'private');
+}
+
+/* ── Login ── */
+$('loginBtn').addEventListener('click', doLogin);
+$('apiKeyInput').addEventListener('keypress', e => { if(e.key === 'Enter') doLogin(); });
+
+async function doLogin(){
+  const raw = $('apiKeyInput').value.trim();
+  if(!raw){ loginError.textContent = 'Vui lòng nhập API key.'; return; }
+  loginError.textContent = '';
+  const btn = $('loginBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Đang kiểm tra...';
+  try {
+    const data = await apiPost(STOCK_URL, { api_key: raw });
+    if(data.status === 'success'){
+      sessionStorage.setItem('tm_api_key', raw);
+      bootApp(raw, 'private');
+    } else {
+      loginError.textContent = 'API key không hợp lệ. Kiểm tra lại.';
+    }
+  } catch(e){
+    loginError.textContent = 'Lỗi kết nối – kiểm tra proxy hoặc mạng.';
+    console.error('[Login error]', e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Xác nhận & tiếp tục';
+  }
+}
+
+/* ── Logout ── */
+$('logoutBtn').addEventListener('click', () => {
+  sessionStorage.removeItem('tm_api_key');
+  currentKey = ''; selectedProductId = null; lastKeys = []; stockProducts = [];
+  appEl.style.display = 'none';
+  loginScreen.style.display = 'block';
+  $('apiKeyInput').value = '';
+  loginError.textContent = '';
+  resultCard.style.display = 'none';
+  statusMsg.textContent = '';
+});
+
+/* ── Load stock ── */
+$('refreshBtn').addEventListener('click', loadStock);
+
+async function loadStock(){
+  const btn = $('refreshBtn');
+  btn.disabled = true;
+  btn.textContent = '↻ Đang tải...';
+  balanceVal.textContent = '—';
+  stockBody.innerHTML = '<tr><td colspan="3" style="color:var(--muted);padding:14px 0;text-align:center;">Đang tải...</td></tr>';
+  prodList.innerHTML  = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:14px;">Đang tải...</div>';
+
+  try {
+    const data = await apiPost(STOCK_URL, { api_key: currentKey });
+    const bal = data.user_balance ?? data.balance ?? data.balance_left ?? data.so_du ?? null;
+    if(bal !== null) balanceVal.textContent = fmtNum(bal) + ' đ';
+
+    stockProducts = data.products || [];
+    renderStock(stockProducts);
+    renderProductSelector(stockProducts);
+  } catch(e){
+    stockBody.innerHTML = '<tr><td colspan="3" style="color:var(--danger);padding:10px 0;">Lỗi tải dữ liệu. Thử làm mới lại.</td></tr>';
+    prodList.innerHTML  = '<div style="color:var(--danger);font-size:13px;padding:8px;">Không tải được sản phẩm.</div>';
+    console.error('[Stock error]', e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '↻ Làm mới';
+  }
+}
+
+function renderStock(products){
+  if(!products.length){
+    stockBody.innerHTML = '<tr><td colspan="3" style="color:var(--muted);padding:10px 0;">Không có dữ liệu</td></tr>';
+    return;
+  }
+  stockBody.innerHTML = products.map(p => `
+    <tr>
+      <td style="padding-right:8px;">${escHtml(p.name)}</td>
+      <td class="price-cell">${fmtNum(p.price)} đ</td>
+      <td class="${stockClass(p.stock)}">${fmtNum(p.stock)}</td>
+    </tr>
+  `).join('');
+}
+
+function renderProductSelector(products){
+  if(!products.length){
+    prodList.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px;">Không có sản phẩm nào.</div>';
+    return;
+  }
+  prodList.innerHTML = products.map(p => `
+    <div class="prod-item${p.stock===0?' disabled-prod':''}" data-id="${p.product_id}">
+      <div class="prod-name">${escHtml(p.name)}${p.stock===0?' <span style="color:var(--danger);font-size:11px;">[Hết hàng]</span>':''}</div>
+      <div class="prod-meta">
+        Giá: <span class="hi">${fmtNum(p.price)} đ / mail</span>
+        &nbsp;·&nbsp; Tồn: <span class="${stockClass(p.stock)}">${fmtNum(p.stock)}</span>
+      </div>
+    </div>
+  `).join('');
+
+  prodList.querySelectorAll('.prod-item:not(.disabled-prod)').forEach(el => {
+    el.addEventListener('click', () => {
+      prodList.querySelectorAll('.prod-item').forEach(x => x.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedProductId = parseInt(el.getAttribute('data-id'));
+    });
+  });
+
+  const first = prodList.querySelector('.prod-item:not(.disabled-prod)');
+  if(first) first.click();
+}
+
+/* ── Qty ── */
+$('qtyMinus').addEventListener('click', () => {
+  qtyInput.value = Math.max(1, parseInt(qtyInput.value||1) - 1);
+});
+$('qtyPlus').addEventListener('click', () => {
+  qtyInput.value = Math.min(20, parseInt(qtyInput.value||1) + 1);
+});
+qtyInput.addEventListener('change', () => {
+  let v = parseInt(qtyInput.value) || 1;
+  qtyInput.value = Math.min(20, Math.max(1, v));
+});
+
+/* ── Buy ── */
+buyBtn.addEventListener('click', async () => {
+  if(!selectedProductId){
+    statusMsg.className = 'err';
+    statusMsg.textContent = 'Vui lòng chọn sản phẩm trước.';
+    return;
+  }
+  const qty = Math.max(1, Math.min(20, parseInt(qtyInput.value||1)));
+  statusMsg.className = '';
+  statusMsg.textContent = '';
+  buyBtn.disabled = true;
+  buyBtn.innerHTML = '<span class="spinner"></span>Đang mua...';
+
+  try {
+    const data = await apiPost(BUY_URL, {
+      api_key:    currentKey,
+      product_id: selectedProductId,
+      qty:        qty,
+    });
+
+    if(data.status === 'success'){
+      lastKeys = data.keys || [];
+      renderResult(data);
+      statusMsg.className = 'ok';
+      statusMsg.textContent = `✓ Mua thành công ${lastKeys.length} mail.`;
+      loadStock();
+      if(lastKeys.length === 1){
+        copyText(lastKeys[0]);
+        statusMsg.textContent += ' Đã copy vào clipboard.';
+      }
+    } else {
+      statusMsg.className = 'err';
+      statusMsg.textContent = data.message || 'Mua hàng thất bại.';
+    }
+  } catch(e){
+    statusMsg.className = 'err';
+    statusMsg.textContent = 'Lỗi kết nối, thử lại.';
+    console.error('[Buy error]', e);
+  } finally {
+    buyBtn.disabled = false;
+    buyBtn.textContent = 'Mua ngay';
+  }
+});
+
+function renderResult(data){
+  resultCard.style.display = 'block';
+  orderCodeEl.textContent = data.order_code ? `Mã đơn: ${data.order_code}` : '';
+  keyList.innerHTML = '';
+  (data.keys || []).forEach((k, i) => {
+    const item = document.createElement('div');
+    item.className = 'key-item';
+    item.innerHTML = `
+      <span class="key-text">${escHtml(k)}</span>
+      <button type="button" data-idx="${i}">Copy</button>
+    `;
+    keyList.appendChild(item);
+  });
+  keyList.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.getAttribute('data-idx'));
+      copyText(lastKeys[idx]);
+      btn.textContent = 'Đã copy';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+    });
+  });
+  resultCard.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+copyAllBtn.addEventListener('click', () => {
+  copyText(lastKeys.join('\n'));
+  copyAllBtn.textContent = 'Đã copy tất cả!';
+  copyAllBtn.classList.add('copied');
+  setTimeout(() => { copyAllBtn.textContent = 'Copy tất cả'; copyAllBtn.classList.remove('copied'); }, 1500);
+});
+
+function copyText(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;left:-9999px;top:0;';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch(e){}
+  document.body.removeChild(ta);
+}
+</script>
+</body>
+</html>
