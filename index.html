@@ -412,7 +412,10 @@ async function loadStock(){
     const bal = data.user_balance ?? data.balance ?? data.balance_left ?? data.so_du ?? null;
     if(bal !== null) balanceVal.textContent = fmtNum(bal) + ' đ';
 
-    stockProducts = data.products || [];
+   stockProducts = (data.products || []).filter(p =>
+    p.name.includes("MAIL LIVE TICTOK YOUTUBE") &&
+    p.price == 59
+);
     renderStock(stockProducts);
     renderProductSelector(stockProducts);
   } catch(e){
