@@ -12,27 +12,36 @@
 <title>Mua Mail TikTok / YouTube</title>
 <meta property="og:title" content="Mua Mail TikTok / YouTube">
 <meta property="og:description" content="Mail live 2h - Dùng ngay sau khi mua">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
 :root{
-    --primary: #4f46e5;
-    --primary-dark: #4338ca;
-    --primary-light: #6366f1;
-    --accent: #06b6d4;
-    --success: #16a34a;
-    --danger: #dc2626;
-    --text-dark: #1e1b2e;
-    --text-mid: #6b7280;
-    --bg-soft: #f4f4f8;
+    --bg:        #0B0E14;
+    --panel:     #12161F;
+    --panel-alt: #161B26;
+    --line:      #232938;
+    --text:      #E7EAF0;
+    --text-dim:  #7C8699;
+    --text-faint:#4B5468;
+    --accent:    #43E0A4;
+    --accent-dim:#1F4A3B;
+    --warn:      #FF6868;
+    --warn-dim:  #3A1E22;
+    --font-ui:   'Inter', -apple-system, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
 }
 
 body{
-    font-family: 'Segoe UI', -apple-system, Roboto, Arial, sans-serif;
-    background: linear-gradient(160deg, #eef0ff 0%, #f6f7fb 45%, #eafafe 100%);
+    font-family: var(--font-ui);
+    background: var(--bg);
+    background-image:
+        radial-gradient(circle at 15% 0%, rgba(67,224,164,0.06), transparent 40%);
+    color: var(--text);
     min-height: 100vh;
-    padding: 16px;
-    color: var(--text-dark);
+    padding: 14px;
 }
 
 .wrap{
@@ -40,15 +49,14 @@ body{
     margin: auto;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 .card{
-    background: white;
-    border-radius: 20px;
-    padding: 18px;
-    box-shadow: 0 4px 18px rgba(79,70,229,0.08), 0 1px 3px rgba(0,0,0,0.04);
-    border: 1px solid rgba(79,70,229,0.05);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px;
 }
 
 /* HEADER */
@@ -58,100 +66,136 @@ body{
     align-items: center;
 }
 .site-title{
-    font-size: 19px;
-    font-weight: 800;
-    letter-spacing: -0.3px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.site-title .mark{
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+    flex-shrink: 0;
 }
 .share-btn{
-    background: var(--bg-soft);
-    color: var(--text-mid);
-    border: 1px solid #e5e7eb;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 700;
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--line);
+    padding: 7px 13px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: var(--font-mono);
+    letter-spacing: 0.3px;
     cursor: pointer;
     transition: 0.15s;
 }
-.share-btn:active{ transform: scale(0.96); }
+.share-btn:active{ transform: scale(0.96); border-color: var(--text-dim); }
 
-/* PRODUCT BANNER */
+/* PRODUCT TICKER */
 .product-banner{
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 55%, var(--accent) 100%);
-    border-radius: 18px;
-    padding: 20px;
-    color: white;
+    background: var(--panel-alt);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 8px 24px rgba(79,70,229,0.28);
 }
-.product-banner::after{
-    content:'';
-    position:absolute;
-    width: 160px; height: 160px;
-    background: rgba(255,255,255,0.12);
-    border-radius: 50%;
-    top: -60px; right: -50px;
+.product-banner::before{
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0.6;
 }
-.product-title{ font-size: 17px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.2px; }
-.product-sub{ font-size: 12.5px; opacity: 0.85; margin-bottom: 16px; }
+.product-eyebrow{
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+.product-title{ font-size: 16px; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+.product-sub{ font-size: 12px; color: var(--text-dim); margin-bottom: 16px; }
 .product-meta{
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    position: relative;
-    z-index: 1;
 }
 .stock-tag{
-    background: rgba(255,255,255,0.22);
-    backdrop-filter: blur(4px);
-    border-radius: 20px;
-    padding: 5px 13px;
-    font-size: 12px;
-    font-weight: 600;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
-.price-big{ font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
-.price-unit{ font-size: 12px; opacity: 0.85; }
+.stock-tag .dot{
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    animation: pulse 1.8s ease-in-out infinite;
+}
+.stock-tag.out .dot{ background: var(--warn); animation: none; }
+.stock-tag.out{ color: var(--warn); }
+@keyframes pulse{
+    0%, 100%{ opacity: 1; }
+    50%{ opacity: 0.35; }
+}
+.price-big{
+    font-family: var(--font-mono);
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: -0.3px;
+}
+.price-unit{ font-size: 11px; color: var(--text-faint); text-align: right; margin-top: 2px; }
 
 /* LOGIN THUEMAIL */
 .tm-label{
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text-mid);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
     margin-bottom: 10px;
+    font-family: var(--font-mono);
 }
 .tm-input{
     width: 100%;
-    padding: 13px 14px;
-    border: 1.5px solid #e5e7eb;
-    background: var(--bg-soft);
-    border-radius: 12px;
+    padding: 12px 13px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
     font-size: 14px;
     outline: none;
-    margin-bottom: 9px;
-    transition: 0.15s;
+    margin-bottom: 8px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
 }
-.tm-input:focus{ border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+.tm-input::placeholder{ color: var(--text-faint); }
+.tm-input:focus{ border-color: var(--accent); }
 .tm-btn{
     width: 100%;
-    padding: 13px;
+    padding: 12px;
     border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    color: white;
-    font-size: 14px;
-    font-weight: 700;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #06140F;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
     cursor: pointer;
     transition: 0.15s;
-    box-shadow: 0 4px 12px rgba(79,70,229,0.25);
 }
 .tm-btn:active{ transform: scale(0.98); }
+.tm-btn:disabled{ background: var(--line); color: var(--text-faint); }
 .msg{ font-size: 12px; margin-top: 8px; text-align: center; }
 
 /* SESSION INFO */
@@ -159,103 +203,83 @@ body{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
-    border: 1px solid #bbf7d0;
-    border-radius: 13px;
-    padding: 11px 15px;
+    background: var(--panel-alt);
+    border: 1px solid var(--accent-dim);
+    border-radius: 8px;
+    padding: 10px 14px;
 }
-.session-name{ font-size: 14px; font-weight: 700; color: #15803d; }
-.session-label{ font-size: 11px; color: #4ade80; font-weight: 600; letter-spacing: 0.3px; }
+.session-name{ font-size: 13px; font-weight: 600; color: var(--text); font-family: var(--font-mono); }
+.session-label{ font-size: 10px; color: var(--accent); letter-spacing: 0.5px; font-family: var(--font-mono); }
 .logout-sm{
-    background: #fee2e2;
-    color: var(--danger);
-    border: none;
-    padding: 6px 12px;
-    border-radius: 9px;
-    font-size: 12px;
-    font-weight: 600;
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--line);
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
     cursor: pointer;
 }
+.logout-sm:active{ border-color: var(--warn); color: var(--warn); }
 
 /* BUY FORM */
 .qty-row{
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
-.qty-stepper{
-    flex: 1;
-    display: flex;
-    align-items: center;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 12px;
-    overflow: hidden;
-    background: var(--bg-soft);
-}
-.qty-btn{
-    width: 40px;
-    height: 46px;
-    border: none;
-    background: transparent;
-    color: var(--primary);
-    font-size: 18px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.15s;
-    flex-shrink: 0;
-}
-.qty-btn:active{ background: rgba(79,70,229,0.1); }
 .qty-input{
     flex: 1;
-    width: 100%;
-    padding: 13px 4px;
-    border: none;
-    background: transparent;
-    font-size: 16px;
-    font-weight: 700;
+    padding: 13px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 15px;
     outline: none;
     text-align: center;
-    color: var(--text-dark);
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
 }
-.qty-input::-webkit-outer-spin-button,
-.qty-input::-webkit-inner-spin-button{ -webkit-appearance: none; margin:0; }
+.qty-input::placeholder{ color: var(--text-faint); font-family: var(--font-ui); }
+.qty-input:focus{ border-color: var(--accent); }
 .total-display{
-    font-size: 17px;
-    font-weight: 800;
-    color: var(--primary);
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent);
     min-width: 84px;
     text-align: right;
 }
 .buy-btn{
     width: 100%;
-    padding: 15px;
+    padding: 14px;
     border: none;
-    border-radius: 13px;
-    background: linear-gradient(135deg, var(--success), #22c55e);
-    color: white;
-    font-size: 15px;
-    font-weight: 700;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #06140F;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
     cursor: pointer;
     transition: 0.15s;
-    box-shadow: 0 4px 14px rgba(22,163,74,0.3);
 }
 .buy-btn:active{ transform: scale(0.98); }
-.buy-btn:disabled{ background: #9ca3af; cursor: not-allowed; box-shadow: none; }
+.buy-btn:disabled{ background: var(--line); color: var(--text-faint); cursor: not-allowed; }
 
 /* STATUS */
 .status{
-    padding: 12px;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 600;
+    padding: 11px;
+    border-radius: 8px;
+    font-size: 12px;
     text-align: center;
     display: none;
+    font-family: var(--font-mono);
+    border: 1px solid transparent;
 }
 .status.show{ display: block; }
-.status.success{ background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; }
-.status.error  { background:#fee2e2; color:#dc2626; border:1px solid #fecaca; }
-.status.loading{ background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; }
+.status.success{ background: var(--accent-dim); color: var(--accent); border-color: rgba(67,224,164,0.3); }
+.status.error  { background: var(--warn-dim); color: var(--warn); border-color: rgba(255,104,104,0.3); }
+.status.loading{ background: var(--panel-alt); color: var(--text-dim); border-color: var(--line); }
 
 /* MAIL RESULT */
 .result-box{
@@ -266,72 +290,81 @@ body{
 .result-box.show{ display: flex; }
 
 .mail-item{
-    background: var(--bg-soft);
-    border: 1px solid #ececf5;
-    border-radius: 12px;
-    padding: 12px 14px;
+    background: var(--panel-alt);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 11px 14px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 8px;
 }
 .mail-text{
-    font-size: 13px;
+    font-size: 12.5px;
     word-break: break-all;
     flex: 1;
-    color: var(--text-dark);
+    color: var(--text);
+    font-family: var(--font-mono);
 }
 .copy-btn{
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 7px 13px;
-    border-radius: 9px;
-    font-size: 12px;
-    font-weight: 700;
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent-dim);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    letter-spacing: 0.3px;
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
-    transition: 0.15s;
 }
 .copy-btn.copied{
-    background: var(--success);
+    background: var(--accent-dim);
 }
 .copy-all-btn{
     width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 12px;
-    background: var(--text-dark);
-    color: white;
-    font-size: 13px;
-    font-weight: 700;
+    padding: 11px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    letter-spacing: 0.3px;
     cursor: pointer;
 }
 
 /* HISTORY */
 .history-item{
-    padding: 11px 13px;
-    background: var(--bg-soft);
-    border-radius: 12px;
-    margin-bottom: 7px;
+    padding: 10px 12px;
+    background: var(--panel-alt);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin-bottom: 6px;
 }
 .history-row{
     display: flex;
     justify-content: space-between;
-    font-size: 13px;
+    font-size: 12.5px;
     margin-bottom: 3px;
-    font-weight: 600;
+    font-family: var(--font-mono);
 }
 .history-meta{
-    font-size: 11px;
-    color: #9ca3af;
+    font-size: 10.5px;
+    color: var(--text-faint);
+    font-family: var(--font-mono);
 }
 .section-title{
-    font-size: 13px;
-    font-weight: 700;
-    color: #374151;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
     margin-bottom: 10px;
+    font-family: var(--font-mono);
 }
 </style>
 </head>
@@ -341,16 +374,17 @@ body{
 
     <!-- HEADER -->
     <div class="card header">
-        <div class="site-title">🛒 Mua Mail</div>
-        <button class="share-btn" onclick="shareLink()">📤 SHARE</button>
+        <div class="site-title"><span class="mark"></span>Mua Mail <span class="sub">v2.1</span></div>
+        <button class="share-btn" onclick="shareLink()">SHARE</button>
     </div>
 
     <!-- PRODUCT BANNER -->
     <div class="product-banner">
-        <div class="product-title">MAIL LIVE TIKTOK / YOUTUBE</div>
-        <div class="product-sub">⚡ Live 2 giờ kể từ khi mua — Dùng được ngay</div>
+        <div class="product-eyebrow">Sản phẩm #29</div>
+        <div class="product-title">Mail live TikTok / YouTube</div>
+        <div class="product-sub">Live 2 giờ kể từ khi mua — dùng được ngay</div>
         <div class="product-meta">
-            <div class="stock-tag" id="stock-tag">📦 Đang tải...</div>
+            <div class="stock-tag" id="stock-tag"><span class="dot"></span>Đang tải...</div>
             <div>
                 <div class="price-big" id="price-display">59đ</div>
                 <div class="price-unit">/ 1 mail</div>
@@ -360,14 +394,14 @@ body{
 
     <!-- LOGIN THUEMAIL (ẩn khi đã login) -->
     <div class="card" id="login-card">
-        <div class="tm-label">🔑 Đăng nhập thuemail.net</div>
+        <div class="tm-label">Đăng nhập thuemail.net</div>
         <input class="tm-input" type="text"     id="tm-user" placeholder="Username">
         <input class="tm-input" type="password" id="tm-pass" placeholder="Mật khẩu"
                onkeydown="if(event.key==='Enter') tmLogin()">
         <button class="tm-btn" id="tm-login-btn" onclick="tmLogin()">
             Đăng nhập
         </button>
-        <div class="msg" id="login-msg" style="color:#ef4444;"></div>
+        <div class="msg" id="login-msg" style="color:var(--warn);"></div>
     </div>
 
     <!-- SESSION BAR (hiện khi đã login) -->
@@ -384,35 +418,31 @@ body{
     <!-- MUA -->
     <div class="card" id="buy-card">
         <div class="qty-row">
-            <div class="qty-stepper">
-                <button type="button" class="qty-btn" onclick="stepQty(-1)">−</button>
-                <input type="number" class="qty-input" id="qty"
-                       value="1" min="1" max="50"
-                       oninput="calcTotal()">
-                <button type="button" class="qty-btn" onclick="stepQty(1)">+</button>
-            </div>
+            <input type="number" class="qty-input" id="qty"
+                   placeholder="Số lượng" min="1" max="50"
+                   oninput="calcTotal()">
             <div class="total-display" id="total">0đ</div>
         </div>
         <button class="buy-btn" id="buy-btn" onclick="doBuy()" disabled>
-            🔒 Đăng nhập thuemail để mua
+            Đăng nhập thuemail để mua
         </button>
         <div class="status" id="status-box" style="margin-top:8px;"></div>
     </div>
 
     <!-- KẾT QUẢ MAIL -->
     <div class="card" id="result-card" style="display:none;">
-        <div class="section-title">📩 Mail vừa mua</div>
+        <div class="section-title">Mail vừa mua</div>
         <div class="result-box show" id="mail-list"></div>
         <button class="copy-all-btn" style="margin-top:8px;" onclick="copyAll()">
-            📋 COPY TẤT CẢ
+            COPY TẤT CẢ
         </button>
     </div>
 
     <!-- LỊCH SỬ -->
     <div class="card">
-        <div class="section-title">🕐 Lịch sử mua</div>
+        <div class="section-title">Lịch sử mua</div>
         <div id="history-list">
-            <div style="font-size:12px;color:#aaa;text-align:center;padding:8px;">
+            <div style="font-size:12px;color:var(--text-faint);text-align:center;padding:8px;font-family:var(--font-mono);">
                 Chưa có lịch sử
             </div>
         </div>
@@ -440,7 +470,6 @@ let HISTORY       = JSON.parse(localStorage.getItem('shop_history')||'[]');
 window.addEventListener('load', ()=>{
     loadStock();
     renderHistory();
-    calcTotal();
     if(TM_SESSION) showSession();
 });
 
@@ -460,15 +489,16 @@ async function loadStock(){
                 PRICE = p.price;
                 document.getElementById('price-display').innerText =
                     Number(p.price).toLocaleString('vi') + 'đ';
-                document.getElementById('stock-tag').innerText =
-                    p.available
-                    ? '📦 Còn: ' + Number(p.stock).toLocaleString('vi')
-                    : '❌ Hết hàng';
+                let tagEl = document.getElementById('stock-tag');
+                tagEl.classList.toggle('out', !p.available);
+                tagEl.innerHTML = '<span class="dot"></span>' +
+                    (p.available
+                        ? 'Còn: ' + Number(p.stock).toLocaleString('vi')
+                        : 'Hết hàng');
                 if(!p.available){
                     document.getElementById('buy-btn').disabled  = true;
-                    document.getElementById('buy-btn').innerText = '❌ Hết hàng';
+                    document.getElementById('buy-btn').innerText = 'Hết hàng';
                 }
-                calcTotal();
             }
         }
     }catch(e){}
@@ -481,13 +511,13 @@ async function tmLogin(){
     let user = document.getElementById('tm-user').value.trim();
     let pass = document.getElementById('tm-pass').value.trim();
     if(!user||!pass){
-        setMsg('⚠️ Nhập đầy đủ thông tin','#ef4444');
+        setMsg('Nhập đầy đủ thông tin','var(--warn)');
         return;
     }
 
     let btn = document.getElementById('tm-login-btn');
     btn.disabled  = true;
-    btn.innerText = '⏳ Đang đăng nhập...';
+    btn.innerText = 'Đang đăng nhập...';
     setMsg('','');
 
     try{
@@ -499,7 +529,7 @@ async function tmLogin(){
         const data = await res.json();
 
         if(data.error){
-            setMsg('❌ ' + data.error, '#ef4444');
+            setMsg(data.error, 'var(--warn)');
             return;
         }
 
@@ -512,7 +542,7 @@ async function tmLogin(){
         loadStock();
 
     }catch(e){
-        setMsg('❌ Lỗi kết nối', '#ef4444');
+        setMsg('Lỗi kết nối', 'var(--warn)');
     }finally{
         btn.disabled  = false;
         btn.innerText = 'Đăng nhập';
@@ -524,7 +554,7 @@ function showSession(){
     document.getElementById('session-card').style.display = 'block';
     document.getElementById('session-name').innerText     = TM_USER_NAME;
     document.getElementById('buy-btn').disabled  = false;
-    document.getElementById('buy-btn').innerText = '🛒 MUA MAIL';
+    document.getElementById('buy-btn').innerText = 'MUA MAIL';
 }
 
 function tmLogout(){
@@ -534,7 +564,7 @@ function tmLogout(){
     document.getElementById('login-card').style.display   = 'block';
     document.getElementById('session-card').style.display = 'none';
     document.getElementById('buy-btn').disabled  = true;
-    document.getElementById('buy-btn').innerText = '🔒 Đăng nhập thuemail để mua';
+    document.getElementById('buy-btn').innerText = 'Đăng nhập thuemail để mua';
     setMsg('','');
 }
 
@@ -548,20 +578,9 @@ function setMsg(txt, color){
    TÍNH TIỀN
 ================================ */
 function calcTotal(){
-    let el = document.getElementById('qty');
-    let q  = parseInt(el.value)||0;
-    if(q < 1){ q = 1; el.value = 1; }
+    let q = parseInt(document.getElementById('qty').value)||0;
     document.getElementById('total').innerText =
         Number(q * PRICE).toLocaleString('vi') + 'đ';
-}
-
-function stepQty(delta){
-    let el = document.getElementById('qty');
-    let q  = (parseInt(el.value)||0) + delta;
-    if(q < 1) q = 1;
-    if(q > 50) q = 50;
-    el.value = q;
-    calcTotal();
 }
 
 /* ================================
@@ -570,13 +589,13 @@ function stepQty(delta){
 async function doBuy(){
     let qty = parseInt(document.getElementById('qty').value);
     if(!qty||qty<1){
-        showStatus('⚠️ Nhập số lượng','error'); return;
+        showStatus('Nhập số lượng','error'); return;
     }
 
     let btn = document.getElementById('buy-btn');
     btn.disabled  = true;
-    btn.innerText = '⏳ Đang xử lý...';
-    showStatus('⏳ Đang mua mail...','loading');
+    btn.innerText = 'Đang xử lý...';
+    showStatus('Đang mua mail...','loading');
 
     /* Ẩn kết quả cũ */
     document.getElementById('result-card').style.display = 'none';
@@ -592,13 +611,13 @@ async function doBuy(){
         const data = await res.json();
 
         if(data.error || data.status !== 'success'){
-            showStatus('❌ ' + (data.error||data.message||'Mua thất bại'), 'error');
+            showStatus(data.error||data.message||'Mua thất bại', 'error');
             return;
         }
 
         LAST_MAILS = data.keys || [];
         if(LAST_MAILS.length === 0){
-            showStatus('❌ Không nhận được mail', 'error');
+            showStatus('Không nhận được mail', 'error');
             return;
         }
 
@@ -617,15 +636,15 @@ async function doBuy(){
         localStorage.setItem('shop_history', JSON.stringify(HISTORY));
         renderHistory();
 
-        document.getElementById('qty').value  = '1';
-        calcTotal();
-        showStatus('✅ Mua thành công ' + LAST_MAILS.length + ' mail!', 'success');
+        document.getElementById('qty').value  = '';
+        document.getElementById('total').innerText = '0đ';
+        showStatus('Mua thành công ' + LAST_MAILS.length + ' mail', 'success');
 
     }catch(e){
-        showStatus('❌ Lỗi: ' + e.message, 'error');
+        showStatus('Lỗi: ' + e.message, 'error');
     }finally{
         btn.disabled  = false;
-        btn.innerText = '🛒 MUA MAIL';
+        btn.innerText = 'MUA MAIL';
     }
 }
 
@@ -675,8 +694,8 @@ function copyAll(){
     let text = LAST_MAILS.join('\n');
     navigator.clipboard.writeText(text).then(()=>{
         let btn = document.querySelector('.copy-all-btn');
-        btn.innerText = '✅ ĐÃ COPY TẤT CẢ';
-        setTimeout(()=>{ btn.innerText = '📋 COPY TẤT CẢ'; }, 2000);
+        btn.innerText = 'ĐÃ COPY TẤT CẢ';
+        setTimeout(()=>{ btn.innerText = 'COPY TẤT CẢ'; }, 2000);
     });
 }
 
@@ -686,19 +705,19 @@ function copyAll(){
 function renderHistory(){
     let box = document.getElementById('history-list');
     if(!HISTORY.length){
-        box.innerHTML='<div style="font-size:12px;color:#aaa;text-align:center;padding:8px;">Chưa có lịch sử</div>';
+        box.innerHTML='<div style="font-size:12px;color:var(--text-faint);text-align:center;padding:8px;font-family:var(--font-mono);">Chưa có lịch sử</div>';
         return;
     }
     box.innerHTML = HISTORY.slice(0,15).map(h=>`
         <div class="history-item">
             <div class="history-row">
-                <span>📦 ${h.qty} mail</span>
-                <span style="font-weight:bold;color:#16a34a;">
+                <span>${h.qty} mail</span>
+                <span style="font-weight:600;color:var(--accent);">
                     ${Number(h.cost).toLocaleString('vi')}đ
                 </span>
             </div>
             <div class="history-meta">
-                🕐 ${h.time}${h.code?' &nbsp;·&nbsp; Mã: '+h.code:''}
+                ${h.time}${h.code?' &nbsp;·&nbsp; Mã: '+h.code:''}
             </div>
         </div>
     `).join('');
@@ -714,8 +733,8 @@ function shareLink(){
     }else{
         navigator.clipboard.writeText(url).then(()=>{
             let btn = document.querySelector('.share-btn');
-            btn.innerText = '✓ COPIED';
-            setTimeout(()=>{ btn.innerText = '📤 SHARE'; }, 2000);
+            btn.innerText = 'COPIED';
+            setTimeout(()=>{ btn.innerText = 'SHARE'; }, 2000);
         });
     }
 }
