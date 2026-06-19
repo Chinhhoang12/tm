@@ -63,6 +63,7 @@
   .eyebrow{color:var(--accent);font-size:11px;letter-spacing:.18em;text-transform:uppercase;}
   .logout-link{color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;}
   .logout-link:hover{color:var(--text);}
+  #menuDropdown .logout-link:hover{background:var(--bg);color:var(--text);}
 
   .title{font-size:22px;font-weight:700;margin:0 0 2px;color:var(--text);}
   .subtitle{color:var(--muted);font-size:13px;margin-bottom:14px;}
@@ -220,37 +221,27 @@
 
     <div class="app-header">
       <div class="eyebrow">Thuemail.net</div>
-      <div style="display:flex;gap:12px;align-items:center;">
-        <span class="logout-link" id="shareLinkBtn">🔗 Link thiết bị khác</span>
-        <span class="logout-link" id="logoutBtn">Đổi API key</span>
+      <div style="position:relative;">
+        <span id="menuBtn" style="cursor:pointer;color:var(--muted);font-size:20px;line-height:1;padding:4px 8px;">⋮</span>
+        <div id="menuDropdown" style="display:none;position:absolute;right:0;top:30px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px;min-width:170px;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.4);">
+          <div class="logout-link" id="shareLinkBtn" style="display:block;padding:9px 10px;border-radius:6px;font-size:12px;text-decoration:none;white-space:nowrap;">🔗 Link thiết bị khác</div>
+          <div class="logout-link" id="logoutBtn" style="display:block;padding:9px 10px;border-radius:6px;font-size:12px;text-decoration:none;white-space:nowrap;">Đổi API key</div>
+        </div>
       </div>
     </div>
     <div class="title">Mail Live TikTok / YouTube</div>
-    <div class="subtitle">Mua xong copy email ngay · hàng tươi theo giờ</div>
-    <span class="mode-badge" id="modeBadge"></span>
 
     <div class="card">
       <div class="row">
         <span class="label">Số dư tài khoản</span>
         <span class="value balance" id="balanceVal">—</span>
       </div>
-      <div class="section-title">
-        <span>Tồn kho sản phẩm</span>
-        <button class="refresh-btn" id="refreshBtn">↻ Làm mới</button>
-      </div>
-      <table class="stock">
-        <thead>
-          <tr><th>Sản phẩm</th><th>Giá</th><th>Tồn</th></tr>
-        </thead>
-        <tbody id="stockBody">
-          <tr><td colspan="3" style="color:var(--muted);padding:14px 0;text-align:center;">Đang tải...</td></tr>
-        </tbody>
-      </table>
     </div>
 
     <div class="card">
       <div class="section-title" style="margin-bottom:14px;">
         <span>Chọn sản phẩm</span>
+        <button class="refresh-btn" id="refreshBtn">↻</button>
       </div>
       <div class="prod-list" id="prodList">
         <div style="color:var(--muted);font-size:13px;text-align:center;padding:14px;">Đang tải sản phẩm...</div>
@@ -274,9 +265,9 @@
     </div>
 
     <div class="footer-note">
-      Tool dùng nội bộ &nbsp;·&nbsp; Đóng tab để xóa session &nbsp;·&nbsp;
       <a href="https://thuemail.net" target="_blank" rel="noopener" style="color:var(--muted);">thuemail.net</a>
     </div>
+
 
   </div><!-- /#app -->
 
@@ -327,9 +318,7 @@ const $ = id => document.getElementById(id);
 const loginScreen = $('loginScreen');
 const appEl       = $('app');
 const loginError  = $('loginError');
-const modeBadge   = $('modeBadge');
 const balanceVal  = $('balanceVal');
-const stockBody   = $('stockBody');
 const prodList    = $('prodList');
 const qtyInput    = $('qtyInput');
 const buyBtn      = $('buyBtn');
@@ -360,13 +349,11 @@ function bootApp(key, mode){
   loginScreen.style.display = 'none';
   appEl.style.display = 'block';
   if(mode === 'public'){
-    modeBadge.textContent = '🌐 Chế độ công khai';
-    modeBadge.className = 'mode-badge public';
     $('logoutBtn').style.display = 'none';
+    $('shareLinkBtn').style.display = 'none';
   } else {
-    modeBadge.textContent = '🔒 Chế độ riêng tư';
-    modeBadge.className = 'mode-badge private';
-    $('logoutBtn').style.display = 'inline';
+    $('logoutBtn').style.display = 'block';
+    $('shareLinkBtn').style.display = 'block';
   }
   loadStock();
 }
@@ -416,9 +403,19 @@ async function doLogin(){
   }
 }
 
+/* ── Kebab menu ── */
+const menuBtn = $('menuBtn');
+const menuDropdown = $('menuDropdown');
+menuBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  menuDropdown.style.display = menuDropdown.style.display === 'block' ? 'none' : 'block';
+});
+document.addEventListener('click', () => { menuDropdown.style.display = 'none'; });
+
 /* ── Share link ── */
 const shareModal = $('shareModal');
 $('shareLinkBtn').addEventListener('click', () => {
+  menuDropdown.style.display = 'none';
   const link = `${location.origin}${location.pathname}?key=${encodeURIComponent(currentKey)}`;
   $('shareLinkInput').value = link;
   shareModal.style.display = 'flex';
@@ -435,6 +432,7 @@ $('shareCopyBtn').addEventListener('click', () => {
 
 /* ── Logout ── */
 $('logoutBtn').addEventListener('click', () => {
+  menuDropdown.style.display = 'none';
   localStorage.removeItem('tm_api_key');
   currentKey = ''; selectedProductId = null; lastKeys = []; stockProducts = [];
   appEl.style.display = 'none';
@@ -451,9 +449,8 @@ $('refreshBtn').addEventListener('click', loadStock);
 async function loadStock(){
   const btn = $('refreshBtn');
   btn.disabled = true;
-  btn.textContent = '↻ Đang tải...';
+  btn.textContent = '↻';
   balanceVal.textContent = '—';
-  stockBody.innerHTML = '<tr><td colspan="3" style="color:var(--muted);padding:14px 0;text-align:center;">Đang tải...</td></tr>';
   prodList.innerHTML  = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:14px;">Đang tải...</div>';
 
   try {
@@ -465,30 +462,14 @@ async function loadStock(){
     p.name.includes("MAIL LIVE TICTOK YOUTUBE") &&
     p.price == 59
 );
-    renderStock(stockProducts);
     renderProductSelector(stockProducts);
   } catch(e){
-    stockBody.innerHTML = '<tr><td colspan="3" style="color:var(--danger);padding:10px 0;">Lỗi tải dữ liệu. Thử làm mới lại.</td></tr>';
     prodList.innerHTML  = '<div style="color:var(--danger);font-size:13px;padding:8px;">Không tải được sản phẩm.</div>';
     console.error('[Stock error]', e);
   } finally {
     btn.disabled = false;
-    btn.textContent = '↻ Làm mới';
+    btn.textContent = '↻';
   }
-}
-
-function renderStock(products){
-  if(!products.length){
-    stockBody.innerHTML = '<tr><td colspan="3" style="color:var(--muted);padding:10px 0;">Không có dữ liệu</td></tr>';
-    return;
-  }
-  stockBody.innerHTML = products.map(p => `
-    <tr>
-      <td style="padding-right:8px;">${escHtml(p.name)}</td>
-      <td class="price-cell">${fmtNum(p.price)} đ</td>
-      <td class="${stockClass(p.stock)}">${fmtNum(p.stock)}</td>
-    </tr>
-  `).join('');
 }
 
 function renderProductSelector(products){
