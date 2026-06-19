@@ -556,10 +556,7 @@ buyBtn.addEventListener('click', async () => {
       statusMsg.className = 'ok';
       statusMsg.textContent = `✓ Mua thành công ${lastKeys.length} mail.`;
       loadStock();
-      if(lastKeys.length === 1){
-        copyText(lastKeys[0]);
-        statusMsg.textContent += ' Đã copy vào clipboard.';
-      }
+      openCopyModal(lastKeys);
     } else {
       statusMsg.className = 'err';
       statusMsg.textContent = data.message || 'Mua hàng thất bại.';
@@ -590,7 +587,7 @@ function renderResult(data){
   keyList.querySelectorAll('button').forEach(btn => {
     btn.addEventListener('click', () => {
       const idx = parseInt(btn.getAttribute('data-idx'));
-      copyText(lastKeys[idx]);
+      copyText(emailOnly(lastKeys[idx]));
       btn.textContent = 'Đã copy';
       btn.classList.add('copied');
       setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
@@ -600,7 +597,7 @@ function renderResult(data){
 }
 
 copyAllBtn.addEventListener('click', () => {
-  copyText(lastKeys.join('\n'));
+  copyText(lastKeys.map(emailOnly).join('\n'));
   copyAllBtn.textContent = 'Đã copy tất cả!';
   copyAllBtn.classList.add('copied');
   setTimeout(() => { copyAllBtn.textContent = 'Copy tất cả'; copyAllBtn.classList.remove('copied'); }, 1500);
@@ -622,6 +619,60 @@ function fallbackCopy(text){
   try { document.execCommand('copy'); } catch(e){}
   document.body.removeChild(ta);
 }
+
+/* ── Lấy phần email (bỏ |password) ── */
+function emailOnly(key){
+  return String(key).split('|')[0].trim();
+}
+
+/* ── Popup copy thủ công (email only, hỗ trợ iPhone) ── */
+const copyModal = document.createElement('div');
+copyModal.id = 'copyModal';
+copyModal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:998;align-items:center;justify-content:center;padding:16px;';
+copyModal.innerHTML = `
+  <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;width:100%;max-width:440px;max-height:80vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <span style="font-size:14px;font-weight:700;color:var(--text);">✓ Mua thành công</span>
+      <span id="copyModalClose" style="cursor:pointer;color:var(--muted);font-size:20px;line-height:1;">✕</span>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Nhấn từng email để sao chép:</div>
+    <div id="copyModalList"></div>
+  </div>
+`;
+document.body.appendChild(copyModal);
+document.getElementById('copyModalClose').addEventListener('click', () => { copyModal.style.display = 'none'; });
+copyModal.addEventListener('click', e => { if(e.target === copyModal) copyModal.style.display = 'none'; });
+
+function openCopyModal(keys){
+  const list = document.getElementById('copyModalList');
+  list.innerHTML = '';
+  keys.forEach((k) => {
+    const mail = emailOnly(k);
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);';
+    row.innerHTML = `
+      <span style="flex:1;font-size:13px;word-break:break-all;color:var(--text);">${escHtml(mail)}</span>
+      <button type="button" style="flex-shrink:0;padding:8px 14px;background:transparent;border:1px solid var(--line);border-radius:8px;color:var(--text);font-size:12px;font-family:inherit;cursor:pointer;">Copy</button>
+    `;
+    const btn = row.querySelector('button');
+    btn.addEventListener('click', () => {
+      copyText(mail);
+      btn.textContent = 'Đã copy';
+      btn.style.background = 'var(--accent)';
+      btn.style.color = '#0a1a17';
+      btn.style.borderColor = 'var(--accent)';
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.style.background = 'transparent';
+        btn.style.color = 'var(--text)';
+        btn.style.borderColor = 'var(--line)';
+      }, 1500);
+    });
+    list.appendChild(row);
+  });
+  copyModal.style.display = 'flex';
+}
+
 </script>
 </body>
 </html>
